@@ -1,3 +1,4 @@
+import java.util
 import org.eclipse.jgit.api.{MergeResult, Git}
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffEntry.ChangeType
@@ -22,10 +23,8 @@ class RebaserTest extends RepositoryTestCase {
     val c: RevCommit = git.commit().setMessage("initial commit").call();
 
     // act
-    val walk: TreeWalk = new TreeWalk(db);
-    walk.addTree(new EmptyTreeIterator());
-    walk.addTree(c.getTree());
-    val result = DiffEntry.scan(walk);
+    val rebaser: Rebaser = new Rebaser(db)
+    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(c)
 
     // assert
     assertThat(Integer.valueOf(result.size()), is(Integer.valueOf(1)));
