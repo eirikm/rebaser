@@ -8,6 +8,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.8" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
-resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
+libraryDependencies += "com.madgag" % "org.eclipse.jgit" % "2.0.0.0.1-UNOFFICIAL-ROBERTO-RELEASE"
 
-libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "[2.1,)"
+libraryDependencies += "com.madgag" % "org.eclipse.jgit.junit" % "2.0.0.0.1-UNOFFICIAL-ROBERTO-RELEASE"
