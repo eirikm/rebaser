@@ -46,10 +46,8 @@ class RebaserTest extends RepositoryTestCase {
     val c2: RevCommit = git.commit().setMessage("commit b").call();
 
     // act
-    val walk: TreeWalk = new TreeWalk(db);
-    walk.addTree(c1.getTree);
-    walk.addTree(c2.getTree());
-    val result = DiffEntry.scan(walk);
+    val rebaser: Rebaser = new Rebaser(db)
+    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(c2)
 
     // assert
     assertThat(Integer.valueOf(result.size()), is(Integer.valueOf(1)));

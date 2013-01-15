@@ -1,17 +1,23 @@
-import java.io.File
-import java.util
-import org.eclipse.jgit.api.{LogCommand, Git}
 import org.eclipse.jgit.diff.DiffEntry
-import org.eclipse.jgit.revwalk.RevCommit
-import org.eclipse.jgit.storage.file.{FileRepository, FileRepositoryBuilder}
+import org.eclipse.jgit.revwalk.{RevWalk, RevCommit}
+import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
-import scala.collection.JavaConverters._
 
 class Rebaser(db: FileRepository) {
   def getAffectedFiles(commit: RevCommit): java.util.List[DiffEntry] = {
     val walk: TreeWalk = new TreeWalk(db);
-    walk.addTree(new EmptyTreeIterator());
-    walk.addTree(commit.getTree());
+
+    commit.getParentCount match {
+      case 0 => walk.addTree(new EmptyTreeIterator())
+      case 1 => {
+        val rw = new RevWalk(db)
+        val parseCommit: RevCommit = rw.parseCommit(commit.getParent(0).getId)
+
+        walk.addTree(parseCommit.getTree)
+      }
+      case _ => println("This should not happen")
+    }
+    walk.addTree(commit.getTree())
     DiffEntry.scan(walk)
   }
 
