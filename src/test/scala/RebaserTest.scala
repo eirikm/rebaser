@@ -14,17 +14,20 @@ import org.eclipse.jgit.diff.DiffEntry.DEV_NULL
 
 class RebaserTest extends RepositoryTestCase {
 
+  case class File(name: String, content: String)
+  type CommitMessage = String
+
+
   @Test
   def initialCommit() {
     // arrange
-    val git = new Git(db);
-    writeTrashFile("a.txt", "content");
-    git.add().addFilepattern("a.txt").call();
-    val c: RevCommit = git.commit().setMessage("initial commit").call();
+    implicit val git = new Git(db);
+    val rebaser: Rebaser = new Rebaser(db)
+
+    val commit: RevCommit = createAddAndCommitFile(File("a.txt", "content"), "initial commit")
 
     // act
-    val rebaser: Rebaser = new Rebaser(db)
-    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(c)
+    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(commit)
 
     // assert
     assertThat(Integer.valueOf(result.size()), is(Integer.valueOf(1)));
@@ -34,20 +37,18 @@ class RebaserTest extends RepositoryTestCase {
     assertThat(entry.getOldPath(), is(DEV_NULL));
   }
 
+
   @Test
   def normalCommit() {
     // arrange
-    val git = new Git(db);
-    writeTrashFile("a.txt", "content");
-    git.add().addFilepattern("a.txt").call();
-    val c1: RevCommit = git.commit().setMessage("commit a").call();
-    writeTrashFile("b.txt", "content");
-    git.add().addFilepattern("b.txt").call();
-    val c2: RevCommit = git.commit().setMessage("commit b").call();
+    implicit val git = new Git(db);
+    val rebaser: Rebaser = new Rebaser(db)
+
+    createAddAndCommitFile(File("a.txt", "content"), "commit a")
+    val commit = createAddAndCommitFile(File("b.txt", "content"), "commit b")
 
     // act
-    val rebaser: Rebaser = new Rebaser(db)
-    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(c2)
+    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(commit)
 
     // assert
     assertThat(Integer.valueOf(result.size()), is(Integer.valueOf(1)));
@@ -55,5 +56,11 @@ class RebaserTest extends RepositoryTestCase {
     assertThat(entry.getChangeType(), is(ChangeType.ADD));
     assertThat(entry.getNewPath(), is("b.txt"));
     assertThat(entry.getOldPath(), is(DEV_NULL));
+  }
+
+  def createAddAndCommitFile(file: File, commitMsg: CommitMessage)(implicit git: Git): RevCommit = {
+    writeTrashFile(file.name, file.content);
+    git.add().addFilepattern(file.name).call();
+    git.commit().setMessage(commitMsg).call()
   }
 }
