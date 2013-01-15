@@ -9,18 +9,18 @@ class Rebaser(db: FileRepository) {
 
     commit.getParentCount match {
       case 0 => walk.addTree(new EmptyTreeIterator())
-      case 1 => {
-        val rw = new RevWalk(db)
-        val parseCommit: RevCommit = rw.parseCommit(commit.getParent(0).getId)
-
-        walk.addTree(parseCommit.getTree)
-      }
+      case 1 => walk.addTree(getParentCommit(commit).getTree)
       case _ => println("This should not happen")
     }
     walk.addTree(commit.getTree())
     DiffEntry.scan(walk)
   }
 
+
+  def getParentCommit(commit: RevCommit) = {
+    val rw = new RevWalk(db)
+    rw.parseCommit(commit.getParent(0).getId)
+  }
 }
 
 object Rebaser extends App {
