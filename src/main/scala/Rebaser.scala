@@ -29,7 +29,7 @@ class Rebaser(git: Git) {
     }
   }
 
-
+  // waiting for jgit to support rebase --onto before finishing development on this feature
   private def rewordFirstCommit(commit: RevCommit, commitMessage: String): RebaseResult = {
     val tmpBranchName: String = "tmp_first_commit_branch"
     val currentBranch: String = "master"
