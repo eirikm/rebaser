@@ -1,27 +1,15 @@
-import collection.mutable
 import java.util
-import org.eclipse.jgit.api.RebaseCommand.{Step, Action}
-import org.eclipse.jgit.api.RebaseResult.Status
-import org.eclipse.jgit.api.{RebaseResult, RebaseCommand, Git}
-import org.eclipse.jgit.diff.DiffEntry
-import org.eclipse.jgit.diff.DiffEntry.ChangeType
-import org.eclipse.jgit.lib.RepositoryTestCase
+import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.RevCommit
 import org.junit.{Ignore, Test}
 
 
-import org.hamcrest.CoreMatchers.is
 import org.junit.Assert._
-import org.eclipse.jgit.diff.DiffEntry.DEV_NULL
 import scala.Predef.String
 
 import scala.collection.JavaConversions._
 
-class RebaserTest extends RepositoryTestCase {
-
-  case class GitFile(name: String, content: String)
-
-  type CommitMessage = String
+class RewordCommitTest extends AbstractRebaserTest {
 
   @Test
   def rewordSecondCommit {
@@ -88,48 +76,5 @@ class RebaserTest extends RepositoryTestCase {
     // third commit
     val actualCommit3Msg: String = array(2).getShortMessage();
     assertFalse(rewordedCommitMessage equals actualCommit3Msg);
-  }
-
-  @Test
-  def testRebaseInteractiveReword {
-    // arrange
-    implicit val git = new Git(db);
-    val rebaser: Rebaser = new Rebaser(git)
-
-    val c1 = createAddAndCommitFile(GitFile("file1", "content for file1"), "Add file1")
-    val c2 = createAddAndCommitFile(GitFile("file2", "content for file2"), "Add file2")
-    val c3 = createAddAndCommitFile(GitFile("file1", "updated content for file1"), "Updated file1 on master")
-    val c4 = createAddAndCommitFile(GitFile("file2", "updated content for file2"), "updated file2 on side")
-
-    // act
-    val res: RebaseResult = git.rebase().setUpstream(c1).runInteractively(new RebaseCommand.InteractiveHandler {
-      def prepareSteps(javaSteps: util.List[RebaseCommand.Step]) {
-        val steps: mutable.Buffer[Step] = asScalaBuffer(javaSteps)
-        steps foreach {
-          step => {
-            System.out.println(step)
-            step.setAction(Action.REWORD)
-          }
-        }
-      }
-
-      def modifyCommitMessage(commit: String): String = {
-        return "rewritten commit message"
-      }
-    }).call
-
-    // assert
-    //    assertEquals(Status.OK, res.getStatus());
-    val logIterator: util.Iterator[RevCommit] = git.log().all().call().iterator();
-    logIterator.next();
-    // skip first commit;
-    val actualCommitMag: String = logIterator.next().getShortMessage();
-    assertEquals("rewritten commit message", actualCommitMag);
-  }
-
-  def createAddAndCommitFile(file: GitFile, commitMsg: CommitMessage)(implicit git: Git): RevCommit = {
-    writeTrashFile(file.name, file.content);
-    git.add().addFilepattern(file.name).call();
-    git.commit().setMessage(commitMsg).call()
   }
 }
