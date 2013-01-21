@@ -78,7 +78,7 @@ class RebaserTest extends RepositoryTestCase {
 
     // act
     val rewordedCommitMessage: String = "reworded commit message"
-    val res = rebaser.rewordCommit(git, c2, rewordedCommitMessage)
+    val res = rebaser.rewordCommit(c2, rewordedCommitMessage)
 
     // assert
 //    assertEquals(Status.OK, res.getStatus());
@@ -108,7 +108,7 @@ class RebaserTest extends RepositoryTestCase {
 
     // act
     val rewordedCommitMessage: String = "reworded commit message"
-    val res = rebaser.rewordCommit(git, c1, rewordedCommitMessage)
+    val res = rebaser.rewordCommit(c1, rewordedCommitMessage)
 
     // assert
 //    assertEquals(Status.OK, res.getStatus());

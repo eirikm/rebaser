@@ -9,11 +9,14 @@ import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
 import scala.collection.JavaConversions._
 
 
-class Rebaser(git: Git) extends GitUtilityMethods with RewordCommit {
+class Rebaser(_git: Git) extends GitUtilityMethods with RewordCommit {
+
+  def git = _git
+
   def getAffectedFiles(commit: RevCommit): java.util.List[DiffEntry] = {
     val walk: TreeWalk = new TreeWalk(git.getRepository)
 
-    getParentCommit(git, commit) match {
+    getParentCommit(commit) match {
       case None => walk.addTree(new EmptyTreeIterator())
       case Some(parentCommit) => walk.addTree(parentCommit.getTree)
     }
@@ -25,16 +28,19 @@ class Rebaser(git: Git) extends GitUtilityMethods with RewordCommit {
 }
 
 trait RewordCommit extends GitUtilityMethods {
+
+  def git: Git
+
   // TODO should this return new HEAD instead of RebaseResult?
-  def rewordCommit(git: Git, commitToReword: RevCommit, commitMessage: String): RebaseResult = {
-    getParentCommit(git, commitToReword) match {
-      case None => rewordFirstCommit(git, commitToReword, commitMessage)
-      case Some(parentCommit) => rewordOtherCommit(git, commitToReword, commitMessage, parentCommit)
+  def rewordCommit(commitToReword: RevCommit, commitMessage: String): RebaseResult = {
+    getParentCommit(commitToReword) match {
+      case None => rewordFirstCommit(commitToReword, commitMessage)
+      case Some(parentCommit) => rewordOtherCommit(commitToReword, commitMessage, parentCommit)
     }
   }
 
   // waiting for jgit to support rebase --onto before finishing development on this feature
-  private def rewordFirstCommit(git: Git, commit: RevCommit, commitMessage: String): RebaseResult = {
+  private def rewordFirstCommit(commit: RevCommit, commitMessage: String): RebaseResult = {
     val tmpBranchName: String = "tmp_first_commit_branch"
     val currentBranch: String = "master"
 
@@ -49,7 +55,7 @@ trait RewordCommit extends GitUtilityMethods {
     git.rebase().setUpstream(tmpBranchName).call()
   }
 
-  private def rewordOtherCommit(git: Git, commitToReword: RevCommit, commitMessage: String, parentCommit: RevCommit): RebaseResult = {
+  private def rewordOtherCommit(commitToReword: RevCommit, commitMessage: String, parentCommit: RevCommit): RebaseResult = {
     git.rebase().setUpstream(parentCommit).runInteractively(new RebaseCommand.InteractiveHandler {
       def prepareSteps(steps: util.List[RebaseCommand.Step]) {
         steps.get(0).setAction(Action.REWORD)
@@ -63,7 +69,10 @@ trait RewordCommit extends GitUtilityMethods {
 }
 
 trait GitUtilityMethods {
-  def getParentCommit(git: Git, commit: RevCommit): Option[RevCommit] = {
+
+  def git: Git
+
+  def getParentCommit(commit: RevCommit): Option[RevCommit] = {
     commit.getParentCount match {
       case 0 => None
       case _ => {
