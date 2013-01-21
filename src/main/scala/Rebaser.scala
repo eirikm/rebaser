@@ -1,6 +1,6 @@
 import java.lang.Iterable
 import java.util
-import org.eclipse.jgit.api.RebaseCommand.Action
+import org.eclipse.jgit.api.RebaseCommand.{Step, Action}
 import org.eclipse.jgit.api.{RebaseCommand, RebaseResult, Git}
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.ObjectId
@@ -9,7 +9,7 @@ import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
 import scala.collection.JavaConversions._
 
 
-class Rebaser(val git: Git) extends GitUtilityMethods with RewordCommit {
+class Rebaser(val git: Git) extends GitUtilityMethods with RewordCommit with SwapCommit {
 
   def getAffectedFiles(commit: RevCommit): java.util.List[DiffEntry] = {
     val walk: TreeWalk = new TreeWalk(git.getRepository)
@@ -63,6 +63,27 @@ trait RewordCommit extends GitUtilityMethods {
         return commitMessage
       }
     }).call
+  }
+}
+
+trait SwapCommit extends GitUtilityMethods {
+  // TODO return new HEAD commit instead of rebase result
+  def swapWithNextCommit(commit: RevCommit): RebaseResult = {
+    getParentCommit(commit) match {
+//      case None =>
+      case Some(parentCommit) => {
+        git.rebase().setUpstream(parentCommit).runInteractively(new RebaseCommand.InteractiveHandler {
+          def prepareSteps(steps: util.List[Step]) {
+            // swap step 0 and step 1
+            val tmp = steps.get(0)
+            steps.set(0, steps.get(1))
+            steps.set(1, tmp)
+          }
+
+          def modifyCommitMessage(commit: String) = commit
+        }).call()
+      }
+    }
   }
 }
 
