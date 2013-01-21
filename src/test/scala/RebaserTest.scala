@@ -23,47 +23,6 @@ class RebaserTest extends RepositoryTestCase {
 
   type CommitMessage = String
 
-
-  @Test
-  def diffInitialCommit() {
-    // arrange
-    implicit val git = new Git(db);
-    val rebaser: Rebaser = new Rebaser(git)
-
-    val commit: RevCommit = createAddAndCommitFile(GitFile("a.txt", "content"), "initial commit")
-
-    // act
-    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(commit)
-
-    // assert
-    assertThat(Integer.valueOf(result.size()), is(Integer.valueOf(1)));
-    val entry: DiffEntry = result.get(0);
-    assertThat(entry.getChangeType(), is(ChangeType.ADD));
-    assertThat(entry.getNewPath(), is("a.txt"));
-    assertThat(entry.getOldPath(), is(DEV_NULL));
-  }
-
-
-  @Test
-  def diffNormalCommit() {
-    // arrange
-    implicit val git = new Git(db);
-    val rebaser: Rebaser = new Rebaser(git)
-
-    createAddAndCommitFile(GitFile("a.txt", "content"), "commit a")
-    val commit = createAddAndCommitFile(GitFile("b.txt", "content"), "commit b")
-
-    // act
-    val result: util.List[DiffEntry] = rebaser.getAffectedFiles(commit)
-
-    // assert
-    assertThat(Integer.valueOf(result.size()), is(Integer.valueOf(1)));
-    val entry: DiffEntry = result.get(0);
-    assertThat(entry.getChangeType(), is(ChangeType.ADD));
-    assertThat(entry.getNewPath(), is("b.txt"));
-    assertThat(entry.getOldPath(), is(DEV_NULL));
-  }
-
   @Test
   def rewordSecondCommit {
     // arrange
