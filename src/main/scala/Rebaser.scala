@@ -26,9 +26,6 @@ class Rebaser(val git: Git) extends GitUtilityMethods with RewordCommit with Reo
 }
 
 trait RewordCommit extends GitUtilityMethods {
-
-  val git: Git
-
   // TODO should this return new HEAD instead of RebaseResult?
   def rewordCommit(commitToReword: RevCommit, commitMessage: String): RebaseResult = {
     getParentCommit(commitToReword) match {
