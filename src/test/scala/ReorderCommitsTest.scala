@@ -1,18 +1,11 @@
-import collection.mutable
 import java.util
-import org.eclipse.jgit.api.RebaseCommand.{Step, Action}
 import org.eclipse.jgit.api.RebaseResult.Status
-import org.eclipse.jgit.api.{RebaseResult, RebaseCommand, Git}
-import org.eclipse.jgit.diff.DiffEntry
-import org.eclipse.jgit.diff.DiffEntry.ChangeType
-import org.eclipse.jgit.lib.RepositoryTestCase
+import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.RevCommit
-import org.junit.{Ignore, Test}
+import org.junit.Test
 
 
-import org.hamcrest.CoreMatchers.is
 import org.junit.Assert._
-import org.eclipse.jgit.diff.DiffEntry.DEV_NULL
 import scala.Predef.String
 
 import scala.collection.JavaConversions._
