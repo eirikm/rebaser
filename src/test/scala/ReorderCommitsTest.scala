@@ -74,7 +74,7 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     val newHead = rebaser.swapWithPreviousCommit(c3).get
 
     // assert
-    assertFalse(newHead == c3);
+    assertTrue(newHead != c3);
     val logIterator: util.Iterator[RevCommit] = git.log().all().call().iterator();
 
     val lastCommit: RevCommit = logIterator.next()
