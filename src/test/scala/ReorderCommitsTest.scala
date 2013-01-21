@@ -18,10 +18,9 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     implicit val git = new Git(db);
     val rebaser: Rebaser = new Rebaser(git)
 
-    val commit1Msg: String = "Add file1"
     val commit2Msg: String = "Add file2"
     val commit3Msg: String = "Add file3"
-    val c1 = createAddAndCommitFile(GitFile("file1", "content for file1"), commit1Msg)
+    val c1 = createNotRelevantInitialCommit()
     val c2 = createAddAndCommitFile(GitFile("file2", "content for file2"), commit2Msg)
     val c3 = createAddAndCommitFile(GitFile("file3", "content for file3"), commit3Msg)
 
@@ -45,10 +44,9 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     implicit val git = new Git(db);
     val rebaser: Rebaser = new Rebaser(git)
 
-    val commit1Msg: String = "Add file1"
     val commit2Msg: String = "Add file2"
     val commit3Msg: String = "Add file3"
-    val c1 = createAddAndCommitFile(GitFile(".initial_commit", "initial_commit"), "initial commit")
+    val c1 = createNotRelevantInitialCommit()
     val c2 = createAddAndCommitFile(GitFile("file1", "content for file1"), commit2Msg)
     val c3 = createAddAndCommitFile(GitFile("file1", "content for file3"), commit3Msg)
 
@@ -66,10 +64,9 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     implicit val git = new Git(db);
     val rebaser: Rebaser = new Rebaser(git)
 
-    val commit1Msg: String = "Add file1"
     val commit2Msg: String = "Add file2"
     val commit3Msg: String = "Add file3"
-    val c1 = createAddAndCommitFile(GitFile("file1", "content for file1"), commit1Msg)
+    val c1 = createNotRelevantInitialCommit()
     val c2 = createAddAndCommitFile(GitFile("file2", "content for file2"), commit2Msg)
     val c3 = createAddAndCommitFile(GitFile("file3", "content for file3"), commit3Msg)
 
@@ -93,10 +90,9 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     implicit val git = new Git(db);
     val rebaser: Rebaser = new Rebaser(git)
 
-    val commit1Msg: String = "Add file1"
     val commit2Msg: String = "Add file2"
     val commit3Msg: String = "Add file3"
-    val c1 = createAddAndCommitFile(GitFile(".initial_commit", "initial_commit"), "initial commit")
+    val c1 = createNotRelevantInitialCommit()
     val c2 = createAddAndCommitFile(GitFile("file1", "content for file1"), commit2Msg)
     val c3 = createAddAndCommitFile(GitFile("file1", "content for file3"), commit3Msg)
 

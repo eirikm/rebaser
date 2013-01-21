@@ -12,4 +12,8 @@ abstract class AbstractRebaserTest extends RepositoryTestCase {
     git.add().addFilepattern(file.name).call();
     git.commit().setMessage(commitMsg).call()
   }
+
+  def createNotRelevantInitialCommit()(implicit git: Git): RevCommit = {
+    createAddAndCommitFile(GitFile(".initial_commit", "initial_commit"), "initial commit")
+  }
 }
