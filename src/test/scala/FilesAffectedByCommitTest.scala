@@ -12,7 +12,7 @@ import org.junit.Assert._
 import scala.Predef.String
 
 
-class AffectedFilesByCommit extends AbstractRebaserTest {
+class FilesAffectedByCommitTest extends AbstractRebaserTest {
 
   @Test
   def diffInitialCommit() {
