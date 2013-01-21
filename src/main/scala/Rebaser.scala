@@ -1,6 +1,6 @@
 import java.lang.Iterable
 import java.util
-import org.eclipse.jgit.api.RebaseCommand.{Step, Action}
+import org.eclipse.jgit.api.RebaseCommand.{InteractiveHandler, Step, Action}
 import org.eclipse.jgit.api.{RebaseCommand, RebaseResult, Git}
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.ObjectId
@@ -69,18 +69,23 @@ trait ReorderCommits extends GitUtilityMethods {
     getParentCommit(commit) match {
       case None => None
       case Some(parentCommit) =>
-        Some(
-          git.rebase().setUpstream(parentCommit).runInteractively(new RebaseCommand.InteractiveHandler {
-            def prepareSteps(steps: util.List[Step]) {
-              // swap step 0 and step 1
-              val tmp = steps.get(0)
-              steps.set(0, steps.get(1))
-              steps.set(1, tmp)
-            }
+        val result: RebaseResult = git.rebase().setUpstream(parentCommit).runInteractively(new InteractiveHandler {
+          def prepareSteps(steps: util.List[Step]) {
+            // swap step 0 and step 1
+            val tmp = steps.get(0)
+            steps.set(0, steps.get(1))
+            steps.set(1, tmp)
+          }
 
-            def modifyCommitMessage(commit: String) = commit
-          }).call()
-        )
+          def modifyCommitMessage(commit: String) = commit
+        }).call()
+
+        if (result.getStatus == RebaseResult.Status.OK) {
+          Some(result)
+        } else {
+          git.rebase().setOperation(RebaseCommand.Operation.ABORT).call
+          None
+        }
     }
   }
 
