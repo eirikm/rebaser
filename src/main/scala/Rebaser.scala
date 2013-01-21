@@ -9,11 +9,11 @@ import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
 import scala.collection.JavaConversions._
 
 
-class Rebaser(git: Git) {
+class Rebaser(git: Git) extends GitUtilityMethods {
   def getAffectedFiles(commit: RevCommit): java.util.List[DiffEntry] = {
     val walk: TreeWalk = new TreeWalk(git.getRepository)
 
-    getParentCommit(commit) match {
+    getParentCommit(git, commit) match {
       case None => walk.addTree(new EmptyTreeIterator())
       case Some(parentCommit) => walk.addTree(parentCommit.getTree)
     }
@@ -24,7 +24,7 @@ class Rebaser(git: Git) {
 
   // TODO should this return new HEAD instead of RebaseResult?
   def rewordCommit(commitToReword: RevCommit, commitMessage: String): RebaseResult = {
-    getParentCommit(commitToReword) match {
+    getParentCommit(git, commitToReword) match {
       case None => rewordFirstCommit(commitToReword, commitMessage)
       case Some(parentCommit) => rewordOtherCommit(commitToReword, commitMessage, parentCommit)
     }
@@ -58,7 +58,10 @@ class Rebaser(git: Git) {
     }).call
   }
 
-  private def getParentCommit(commit: RevCommit): Option[RevCommit] = {
+}
+
+trait GitUtilityMethods {
+  def getParentCommit(git: Git, commit: RevCommit): Option[RevCommit] = {
     commit.getParentCount match {
       case 0 => None
       case _ => {
