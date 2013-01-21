@@ -102,7 +102,6 @@ trait ReorderCommits extends GitUtilityMethods {
 }
 
 trait GitUtilityMethods {
-
   val git: Git
 
   def getParentCommit(commit: RevCommit): Option[RevCommit] = {
