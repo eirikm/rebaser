@@ -9,7 +9,7 @@ import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
 import scala.collection.JavaConversions._
 
 
-class Rebaser(val git: Git) extends GitUtilityMethods with RewordCommit with ReorderCommits {
+class Rebaser(val git: Git) extends GitUtilityMethods with RewordCommit with ReorderCommits with ExplodeCommit {
 
   def getAffectedFiles(commit: RevCommit): java.util.List[DiffEntry] = {
     val walk: TreeWalk = new TreeWalk(git.getRepository)
