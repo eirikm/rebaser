@@ -81,10 +81,7 @@ trait ReorderCommits extends GitUtilityMethods {
         }).call()
 
         if (result.getStatus == RebaseResult.Status.OK) {
-          val repository: Repository = git.getRepository
-          val head: ObjectId = repository.resolve("HEAD")
-          val rw = new RevWalk(repository)
-          Some(rw.parseCommit(head))
+          Some(getHeadCommit)
         } else {
           git.rebase().setOperation(RebaseCommand.Operation.ABORT).call
           None
@@ -116,6 +113,13 @@ trait GitUtilityMethods {
         Some(rw.parseCommit(firstCommitId))
       }
     }
+  }
+
+  def getHeadCommit: RevCommit = {
+    val repository: Repository = git.getRepository
+    val head: ObjectId = repository.resolve("HEAD")
+    val rw = new RevWalk(repository)
+    rw.parseCommit(head)
   }
 }
 
