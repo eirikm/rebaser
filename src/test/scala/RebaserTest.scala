@@ -132,33 +132,6 @@ class RebaserTest extends RepositoryTestCase {
   }
 
   @Test
-  def changeCommitOrder {
-    // arrange
-    implicit val git = new Git(db);
-    val rebaser: Rebaser = new Rebaser(git)
-
-    val commit1Msg: String = "Add file1"
-    val commit2Msg: String = "Add file2"
-    val commit3Msg: String = "Add file3"
-    val c1 = createAddAndCommitFile(GitFile("file1", "content for file1"), commit1Msg)
-    val c2 = createAddAndCommitFile(GitFile("file2", "content for file2"), commit2Msg)
-    val c3 = createAddAndCommitFile(GitFile("file3", "content for file3"), commit3Msg)
-
-    // act
-    val res = rebaser.swapWithNextCommit(c2)
-
-    // assert
-    assertEquals(Status.OK, res.getStatus());
-    val logIterator: util.Iterator[RevCommit] = git.log().all().call().iterator();
-
-    val lastCommit: RevCommit = logIterator.next()
-    assertEquals(commit2Msg, lastCommit.getShortMessage());
-
-    val secondToLastCommit: RevCommit = logIterator.next()
-    assertEquals(commit3Msg, secondToLastCommit.getShortMessage());
-  }
-
-  @Test
   def testRebaseInteractiveReword {
     // arrange
     implicit val git = new Git(db);
