@@ -26,10 +26,10 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     val c3 = createAddAndCommitFile(GitFile("file3", "content for file3"), commit3Msg)
 
     // act
-    val res = rebaser.swapWithNextCommit(c2).get
+    val newHead = rebaser.swapWithNextCommit(c2).get
 
     // assert
-    assertEquals(Status.OK, res.getStatus());
+    assertTrue(newHead != c3);
     val logIterator: util.Iterator[RevCommit] = git.log().all().call().iterator();
 
     val lastCommit: RevCommit = logIterator.next()
@@ -53,10 +53,10 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     val c3 = createAddAndCommitFile(GitFile("file1", "content for file3"), commit3Msg)
 
     // act
-    val res = rebaser.swapWithNextCommit(c2)
+    val newHead = rebaser.swapWithNextCommit(c2)
 
     // assert
-    assertEquals(None, res)
+    assertEquals(None, newHead)
     assertEquals(c3, db.resolve("HEAD"))
   }
 
@@ -74,10 +74,10 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     val c3 = createAddAndCommitFile(GitFile("file3", "content for file3"), commit3Msg)
 
     // act
-    val res = rebaser.swapWithPreviousCommit(c3).get
+    val newHead = rebaser.swapWithPreviousCommit(c3).get
 
     // assert
-    assertEquals(Status.OK, res.getStatus());
+    assertFalse(newHead == c3);
     val logIterator: util.Iterator[RevCommit] = git.log().all().call().iterator();
 
     val lastCommit: RevCommit = logIterator.next()
@@ -101,10 +101,10 @@ class ReorderCommitsTest extends AbstractRebaserTest {
     val c3 = createAddAndCommitFile(GitFile("file1", "content for file3"), commit3Msg)
 
     // act
-    val res = rebaser.swapWithPreviousCommit(c3)
+    val newHead = rebaser.swapWithPreviousCommit(c3)
 
     // assert
-    assertEquals(None, res)
+    assertEquals(None, newHead)
     assertEquals(c3, db.resolve("HEAD"))
   }
 }

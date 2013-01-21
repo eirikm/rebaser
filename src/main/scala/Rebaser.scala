@@ -3,7 +3,7 @@ import java.util
 import org.eclipse.jgit.api.RebaseCommand.{InteractiveHandler, Step, Action}
 import org.eclipse.jgit.api.{RebaseCommand, RebaseResult, Git}
 import org.eclipse.jgit.diff.DiffEntry
-import org.eclipse.jgit.lib.ObjectId
+import org.eclipse.jgit.lib.{Repository, ObjectId}
 import org.eclipse.jgit.revwalk.{RevTree, RevWalk, RevCommit}
 import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
 import scala.collection.JavaConversions._
@@ -65,7 +65,7 @@ trait RewordCommit extends GitUtilityMethods {
 
 trait ReorderCommits extends GitUtilityMethods {
   // TODO return new HEAD commit instead of rebase result
-  def swapWithNextCommit(commit: RevCommit): Option[RebaseResult] = {
+  def swapWithNextCommit(commit: RevCommit): Option[RevCommit] = {
     getParentCommit(commit) match {
       case None => None
       case Some(parentCommit) =>
@@ -81,7 +81,10 @@ trait ReorderCommits extends GitUtilityMethods {
         }).call()
 
         if (result.getStatus == RebaseResult.Status.OK) {
-          Some(result)
+          val repository: Repository = git.getRepository
+          val head: ObjectId = repository.resolve("HEAD")
+          val rw = new RevWalk(repository)
+          Some(rw.parseCommit(head))
         } else {
           git.rebase().setOperation(RebaseCommand.Operation.ABORT).call
           None
@@ -90,7 +93,7 @@ trait ReorderCommits extends GitUtilityMethods {
   }
 
   // TODO return new HEAD commit instead of rebase result
-  def swapWithPreviousCommit(commit: RevCommit): Option[RebaseResult] = {
+  def swapWithPreviousCommit(commit: RevCommit): Option[RevCommit] = {
     for {
       parent <- getParentCommit(commit)
       grandParent <- getParentCommit(parent)
