@@ -65,21 +65,33 @@ trait RewordCommit extends GitUtilityMethods {
 
 trait ReorderCommits extends GitUtilityMethods {
   // TODO return new HEAD commit instead of rebase result
-  def swapWithNextCommit(commit: RevCommit): RebaseResult = {
+  def swapWithNextCommit(commit: RevCommit): Option[RebaseResult] = {
     getParentCommit(commit) match {
-//      case None =>
-      case Some(parentCommit) => {
-        git.rebase().setUpstream(parentCommit).runInteractively(new RebaseCommand.InteractiveHandler {
-          def prepareSteps(steps: util.List[Step]) {
-            // swap step 0 and step 1
-            val tmp = steps.get(0)
-            steps.set(0, steps.get(1))
-            steps.set(1, tmp)
-          }
+      case None => None
+      case Some(parentCommit) =>
+        Some(
+          git.rebase().setUpstream(parentCommit).runInteractively(new RebaseCommand.InteractiveHandler {
+            def prepareSteps(steps: util.List[Step]) {
+              // swap step 0 and step 1
+              val tmp = steps.get(0)
+              steps.set(0, steps.get(1))
+              steps.set(1, tmp)
+            }
 
-          def modifyCommitMessage(commit: String) = commit
-        }).call()
-      }
+            def modifyCommitMessage(commit: String) = commit
+          }).call()
+        )
+    }
+  }
+
+  // TODO return new HEAD commit instead of rebase result
+  def swapWithPreviousCommit(commit: RevCommit): Option[RebaseResult] = {
+    for {
+      parent <- getParentCommit(commit)
+      grandParent <- getParentCommit(parent)
+      rebaseResult <- swapWithNextCommit(parent)
+    } yield {
+      rebaseResult
     }
   }
 }
