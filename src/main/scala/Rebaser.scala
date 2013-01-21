@@ -9,9 +9,7 @@ import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
 import scala.collection.JavaConversions._
 
 
-class Rebaser(_git: Git) extends GitUtilityMethods with RewordCommit {
-
-  def git = _git
+class Rebaser(val git: Git) extends GitUtilityMethods with RewordCommit {
 
   def getAffectedFiles(commit: RevCommit): java.util.List[DiffEntry] = {
     val walk: TreeWalk = new TreeWalk(git.getRepository)
@@ -29,7 +27,7 @@ class Rebaser(_git: Git) extends GitUtilityMethods with RewordCommit {
 
 trait RewordCommit extends GitUtilityMethods {
 
-  def git: Git
+  val git: Git
 
   // TODO should this return new HEAD instead of RebaseResult?
   def rewordCommit(commitToReword: RevCommit, commitMessage: String): RebaseResult = {
@@ -70,7 +68,7 @@ trait RewordCommit extends GitUtilityMethods {
 
 trait GitUtilityMethods {
 
-  def git: Git
+  val git: Git
 
   def getParentCommit(commit: RevCommit): Option[RevCommit] = {
     commit.getParentCount match {
