@@ -64,7 +64,6 @@ trait RewordCommit extends GitUtilityMethods {
 }
 
 trait ReorderCommits extends GitUtilityMethods {
-  // TODO return new HEAD commit instead of rebase result
   def swapWithNextCommit(commit: RevCommit): Option[RevCommit] = {
     getParentCommit(commit) match {
       case None => None
@@ -89,7 +88,6 @@ trait ReorderCommits extends GitUtilityMethods {
     }
   }
 
-  // TODO return new HEAD commit instead of rebase result
   def swapWithPreviousCommit(commit: RevCommit): Option[RevCommit] = {
     for {
       parent <- getParentCommit(commit)
