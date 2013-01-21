@@ -22,6 +22,7 @@ class Rebaser(git: Git) {
     DiffEntry.scan(walk)
   }
 
+  // TODO should this return new HEAD instead of RebaseResult?
   def rewordCommit(commitToReword: RevCommit, commitMessage: String): RebaseResult = {
     getParentCommit(commitToReword) match {
       case None => rewordFirstCommit(commitToReword, commitMessage)
