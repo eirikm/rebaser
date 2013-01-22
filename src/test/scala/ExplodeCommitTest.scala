@@ -2,14 +2,15 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.RevCommit
 import org.junit.Test
 
-
 import scala.Predef.String
+
+import org.junit.Assert._
 
 
 class ExplodeCommitTest extends AbstractRebaserTest {
 
   @Test
-  def explodeSecondCommit {
+  def explodeSecondCommitAdd {
     // arrange
     implicit val git = new Git(db);
     val rebaser: Rebaser = new Rebaser(git)
@@ -19,35 +20,34 @@ class ExplodeCommitTest extends AbstractRebaserTest {
 
     val c1 = createNotRelevantInitialCommit()
 
-    List(GitFile("file1", "content for file1"),
-      GitFile("file2", "content for file2")).foreach {
+    List(
+      GitFile("file1", rndContent),
+      GitFile("file2", rndContent)).foreach {
       writeFile _ andThen gitAdd
     }
     val c2: RevCommit = gitCommit(commit2Msg)
     val c3 = createAddAndCommitFile(GitFile("file3", "content for file3"), commit3Msg)
 
     // act
-    val newHead = rebaser.explodeCommit(c2)
+    val newHead: RevCommit = rebaser.explodeCommit(c2).get
 
     // assert
-    //    assertEquals(Status.OK, res.getStatus());
-    //    val logIterator: util.Iterator[RevCommit] = git.log().all().call().iterator();
-    //    logIterator.next();
-    //    // skip first commit;
-    //    val actualCommit2Msg: String = logIterator.next().getShortMessage();
-    //    assertEquals(rewordedCommitMessage, actualCommit2Msg);
-    //
-    //    val actualCommit3Msg: String = logIterator.next().getShortMessage();
-    //    assertFalse(rewordedCommitMessage equals actualCommit3Msg);
+    assertTrue(newHead != c3);
+
+    val logIterator: java.util.Iterator[RevCommit] = git.log().all().call().iterator()
+
+    val lastCommit: RevCommit = logIterator.next()
+    assertEquals(c3.getFullMessage, lastCommit.getFullMessage)
+
+    val splitCommit1: String = logIterator.next().getShortMessage()
+    assertTrue(splitCommit1.contains(c2.getShortMessage))
+
+    val splitCommit2: String = logIterator.next().getShortMessage()
+    assertTrue(splitCommit2.contains(c2.getShortMessage))
   }
 
-  def createAddAndCommitFiles(files: List[GitFile], commitMsg: CommitMessage)(implicit git: Git): RevCommit = {
-    files foreach {
-      file =>
-        writeTrashFile(file.name, file.content)
-        git.add().addFilepattern(file.name).call()
-    }
-    git.commit().setMessage(commitMsg).call()
+  def rndContent: String = {
+    scala.util.Random.alphanumeric.take(20).mkString
   }
 
   def writeFile(file: GitFile): GitFile = {
