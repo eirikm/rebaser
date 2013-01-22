@@ -3,7 +3,8 @@ import org.eclipse.jgit.lib.RepositoryTestCase
 import org.eclipse.jgit.revwalk.RevCommit
 
 abstract class AbstractRebaserTest extends RepositoryTestCase {
-  case class GitFile(name: String, content: String)
+
+  case class GitFile(name: String, content: String = "")
 
   type CommitMessage = String
 

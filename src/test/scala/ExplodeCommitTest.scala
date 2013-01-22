@@ -20,13 +20,11 @@ class ExplodeCommitTest extends AbstractRebaserTest {
 
     val c1 = createNotRelevantInitialCommit()
 
-    List(
-      GitFile("file1", rndContent),
-      GitFile("file2", rndContent)).foreach {
+    List(GitFile("file1"), GitFile("file2")).foreach {
       writeFile _ andThen gitAdd
     }
     val c2: RevCommit = gitCommit(commit2Msg)
-    val c3 = createAddAndCommitFile(GitFile("file3", "content for file3"), commit3Msg)
+    val c3 = createAddAndCommitFile(GitFile("file3"), commit3Msg)
 
     // act
     val newHead: RevCommit = rebaser.explodeCommit(c2).get
