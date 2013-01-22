@@ -48,6 +48,12 @@ object Spike extends SimpleSwingApplication {
             case Seq(commit, _*) => println("Do nothing. More than one commit selected")
             case _ => println("Do nothing. No commit selected")
           }
+        case KeyPressed(_, Key.S, 0, _) =>
+          print(Key.S + ": ")
+          selection.items match {
+            case Seq(commit, _*) => println("squash commits (" + selection.items + ")")
+            case _ => println("Do nothing. Zero or one commit selected")
+          }
 
 //        case KeyPressed(source, key, modifier, location) =>
 //          println("key: " + key + ", modifier: " + modifier)
