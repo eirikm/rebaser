@@ -9,7 +9,9 @@ object Spike extends SimpleSwingApplication {
     title = "Rebaser GUI (first draft)"
     location = new Point(10, 100)
 
-    contents = new ListView(Seq("one", "two", "three", "four")) {
+    val commitList: Seq[String] = Seq("one", "two", "three", "four")
+
+    contents = new ListView(commitList) {
       listenTo(keys)
 
       reactions += {
@@ -17,14 +19,29 @@ object Spike extends SimpleSwingApplication {
           print(Key.Control + " + " + Key.Down + ": ")
           selection.indices.size match {
             case 0 => println("Do nothing. No commit selected")
-            case 1 => println("move commit down (" + selection.items.head + ")")
+            case 1 =>
+              val selectedIndex: Int = selection.indices.head
+              if (selectedIndex == commitList.size - 1)
+                println("can't move past last commit")
+              else {
+                println("move commit down (" + selection.items.head + ")")
+                listData = swapWithNext(listData.toList, selectedIndex)
+                selection.indices.empty
+                selection.indices += selectedIndex + 1
+              }
             case _ => println("Do nothing. More than one commit selected")
           }
         case KeyPressed(_, Key.Up, Key.Modifier.Control, _) =>
           print(Key.Control + " + " + Key.Up + ": ")
           selection.indices.size match {
             case 0 => println("Do nothing. No commit selected")
-            case 1 => println("move commit up (" + selection.items.head + ")")
+            case 1 =>
+              val selectedIndex: Int = selection.indices.head
+              if (selectedIndex == 0)
+                println("can't move before first commit")
+              else
+                println("move commit up (" + selection.items.head + ")")
+
             case _ => println("Do nothing. More than one commit selected")
           }
         case KeyPressed(_, Key.R, 0, _) =>
@@ -63,4 +80,11 @@ object Spike extends SimpleSwingApplication {
       }
     }
   }
+
+  def swapWithNext[A](list: List[A], index: Int): List[A] =
+    list match {
+      case Nil => Nil
+      case x1 :: x2 :: xs if index == 0 => x2 :: x1 :: xs
+      case x :: xs => x :: swapWithNext(xs, index - 1)
+    }
 }
