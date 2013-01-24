@@ -54,9 +54,12 @@ object Spike extends SimpleSwingApplication {
             val selectedIndex: Int = selection.indices.head
             if (selectedIndex == 0)
               println("can't move before first commit")
-            else
+            else {
               println("move commit up (" + selection.items.head + ")")
-
+              listData = swapWithNext(listData.toList, selectedIndex - 1)
+              selection.indices.empty
+              selection.indices += selectedIndex - 1
+            }
           case _ => println("Do nothing. More than one commit selected")
         }
       }
