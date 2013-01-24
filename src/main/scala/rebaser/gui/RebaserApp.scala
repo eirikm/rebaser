@@ -3,7 +3,7 @@ package gui
 import swing._
 import event.{Key, KeyPressed}
 
-object Spike extends SimpleSwingApplication {
+object RebaserApp extends SimpleSwingApplication {
 
   def top = new MainFrame {
     title = "Rebaser GUI (second draft)"
