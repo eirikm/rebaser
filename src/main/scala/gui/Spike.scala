@@ -9,18 +9,18 @@ object Spike extends SimpleSwingApplication {
     title = "Rebaser GUI (first draft)"
     location = new Point(10, 100)
 
-    val commitList: Seq[String] = Seq("one", "two", "three", "four")
+    val commitList = List("one", "two", "three", "four")
 
     contents = new ListView(commitList) {
       listenTo(keys)
 
       reactions += {
-        case KeyPressed(_, Key.Down, Key.Modifier.Control, _) => moveCommitDown()
-        case KeyPressed(_, Key.Up, Key.Modifier.Control, _) => moveCommitUp()
-        case KeyPressed(_, Key.R, 0, _) => rewordCommit()
-        case KeyPressed(_, Key.P, 0, _) => prependCommits()
-        case KeyPressed(_, Key.X, 0, _) => explodeCommit()
-        case KeyPressed(_, Key.S, 0, _) => squashCommits()
+        case KeyPressed(_, Key.Down, Key.Modifier.Control, _) => moveCommitDownCommand()
+        case KeyPressed(_, Key.Up, Key.Modifier.Control, _) => moveCommitUpCommand()
+        case KeyPressed(_, Key.R, 0, _) => rewordCommitCommand()
+        case KeyPressed(_, Key.P, 0, _) => prependCommitsCommand()
+        case KeyPressed(_, Key.X, 0, _) => explodeCommitCommand()
+        case KeyPressed(_, Key.S, 0, _) => squashCommitsCommand()
         case KeyPressed(_, Key.F5, 0, _) => println(Key.F5 + ": Refresh")
 
         //        case KeyPressed(source, key, modifier, location) =>
@@ -28,7 +28,7 @@ object Spike extends SimpleSwingApplication {
       }
 
 
-      def moveCommitDown() {
+      def moveCommitDownCommand() {
         print(Key.Control + " + " + Key.Down + ": ")
         selection.indices.size match {
           case 0 => println("Do nothing. No commit selected")
@@ -46,7 +46,7 @@ object Spike extends SimpleSwingApplication {
         }
       }
 
-      def moveCommitUp() {
+      def moveCommitUpCommand() {
         print(Key.Control + " + " + Key.Up + ": ")
         selection.indices.size match {
           case 0 => println("Do nothing. No commit selected")
@@ -56,7 +56,7 @@ object Spike extends SimpleSwingApplication {
               println("can't move before first commit")
             else {
               println("move commit up (" + selection.items.head + ")")
-              listData = swapWithNext(listData.toList, selectedIndex - 1)
+              listData = swapWithPrevious(listData.toList, selectedIndex)
               selection.indices.empty
               selection.indices += selectedIndex - 1
             }
@@ -64,7 +64,7 @@ object Spike extends SimpleSwingApplication {
         }
       }
 
-      def rewordCommit() {
+      def rewordCommitCommand() {
         print(Key.R + ": ")
         selection.indices.size match {
           case 0 => println("Do nothing. No commit selected")
@@ -73,7 +73,7 @@ object Spike extends SimpleSwingApplication {
         }
       }
 
-      def prependCommits() {
+      def prependCommitsCommand() {
         print(Key.P + ": ")
         selection.indices.size match {
           case 0 => println("Do nothing. No commit selected")
@@ -82,7 +82,7 @@ object Spike extends SimpleSwingApplication {
         }
       }
 
-      def explodeCommit() {
+      def explodeCommitCommand() {
         print(Key.X + ": ")
         selection.indices.size match {
           case 0 => println("Do nothing. No commit selected")
@@ -91,7 +91,7 @@ object Spike extends SimpleSwingApplication {
         }
       }
 
-      def squashCommits() {
+      def squashCommitsCommand() {
         print(Key.S + ": ")
         selection.indices.size match {
           case 0 => println("Do nothing. No commit selected")
@@ -108,4 +108,6 @@ object Spike extends SimpleSwingApplication {
       case x1 :: x2 :: xs if index == 0 => x2 :: x1 :: xs
       case x :: xs => x :: swapWithNext(xs, index - 1)
     }
+
+  def swapWithPrevious[A](list: List[A], index: Int) = swapWithNext(list, index - 1)
 }
