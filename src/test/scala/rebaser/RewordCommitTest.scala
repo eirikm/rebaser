@@ -1,3 +1,5 @@
+package rebaser
+
 import java.util
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.RevCommit

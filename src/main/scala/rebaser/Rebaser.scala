@@ -1,13 +1,14 @@
-import java.lang.Iterable
-import java.util
-import org.eclipse.jgit.api.RebaseCommand.{InteractiveHandler, Step, Action}
-import org.eclipse.jgit.api.{RebaseCommand, RebaseResult, Git}
-import org.eclipse.jgit.diff.DiffEntry
-import org.eclipse.jgit.lib.{Repository, ObjectId}
-import org.eclipse.jgit.revwalk.{RevTree, RevWalk, RevCommit}
-import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
-import scala.collection.JavaConversions._
+package rebaser
 
+import java.util
+import org.eclipse.jgit.api.RebaseCommand.{Step, InteractiveHandler, Action}
+import org.eclipse.jgit.lib.{Repository, ObjectId}
+import org.eclipse.jgit.revwalk.RevWalk
+
+import org.eclipse.jgit.api.{RebaseCommand, RebaseResult, Git}
+import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.diff.DiffEntry
+import org.eclipse.jgit.treewalk.{EmptyTreeIterator, TreeWalk}
 
 class Rebaser(val git: Git) extends GitUtilityMethods with RewordCommit with ReorderCommits with ExplodeCommit {
 

@@ -1,3 +1,5 @@
+package rebaser
+
 import collection.mutable
 import java.util
 import org.eclipse.jgit.api.RebaseCommand.{InteractiveHandler, Step, Action}

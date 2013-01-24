@@ -1,5 +1,6 @@
+package rebaser
+
 import java.util
-import org.eclipse.jgit.api.RebaseResult.Status
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffEntry._
@@ -9,7 +10,6 @@ import org.junit.Test
 
 
 import org.junit.Assert._
-import scala.Predef.String
 
 
 class FilesAffectedByCommitTest extends AbstractRebaserTest {

@@ -6,7 +6,7 @@ import event.{Key, KeyPressed}
 object Spike extends SimpleSwingApplication {
 
   def top = new MainFrame {
-    title = "Rebaser GUI (first draft)"
+    title = "Rebaser GUI (second draft)"
     location = new Point(10, 100)
 
     val commitList = List("one", "two", "three", "four")
