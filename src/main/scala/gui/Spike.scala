@@ -15,50 +15,48 @@ object Spike extends SimpleSwingApplication {
       reactions += {
         case KeyPressed(_, Key.Down, Key.Modifier.Control, _) =>
           print(Key.Control + " + " + Key.Down + ": ")
-          selection.items match {
-            case Seq(commit) => println("move commit down (" + commit + ")")
-            case Seq(commit, _*) => println("Do nothing. More than one commit selected")
-            case _ => println("Do nothing. No commit selected")
+          selection.indices.size match {
+            case 0 => println("Do nothing. No commit selected")
+            case 1 => println("move commit down (" + selection.items.head + ")")
+            case _ => println("Do nothing. More than one commit selected")
           }
         case KeyPressed(_, Key.Up, Key.Modifier.Control, _) =>
           print(Key.Control + " + " + Key.Up + ": ")
-          selection.items match {
-            case Seq(commit) => println("move commit up (" + commit + ")")
-            case Seq(commit, _*) => println("Do nothing. More than one commit selected")
-            case _ => println("Do nothing. No commit selected")
+          selection.indices.size match {
+            case 0 => println("Do nothing. No commit selected")
+            case 1 => println("move commit up (" + selection.items.head + ")")
+            case _ => println("Do nothing. More than one commit selected")
           }
         case KeyPressed(_, Key.R, 0, _) =>
           print(Key.R + ": ")
-          selection.items match {
-            case Seq(commit) => println("reword commit (" + commit + ")")
-            case Seq(commit, _*) => println("Do nothing. More than one commit selected")
-            case _ => println("Do nothing. No commit selected")
+          selection.indices.size match {
+            case 0 => println("Do nothing. No commit selected")
+            case 1 => println("reword commit (" + selection.items.head + ")")
+            case _ => println("Do nothing. More than one commit selected")
           }
         case KeyPressed(_, Key.P, 0, _) =>
           print(Key.P + ": ")
-          selection.items match {
-            case Seq(commit) => println("prepend commit messages (" + commit + ")")
-            case Seq(commit, _*) => println("prepend commit messages (" + selection.items + ")")
-            case _ => println("Do nothing. No commit selected")
+          selection.indices.size match {
+            case 0 => println("Do nothing. No commit selected")
+            case 1 => println("prepend commit messages (" + selection.items.head + ")")
+            case _ => println("prepend commit messages (" + selection.items + ")")
           }
         case KeyPressed(_, Key.X, 0, _) =>
           print(Key.X + ": ")
-          selection.items match {
-            case Seq(commit) => println("explode commit (" + commit + ")")
-            case Seq(commit, _*) => println("Do nothing. More than one commit selected")
-            case _ => println("Do nothing. No commit selected")
+          selection.indices.size match {
+            case 0 => println("Do nothing. No commit selected")
+            case 1 => println("explode commit (" + selection.items.head + ")")
+            case _ => println("Do nothing. More than one commit selected")
           }
         case KeyPressed(_, Key.S, 0, _) =>
           print(Key.S + ": ")
-          selection.items match {
-            case Seq(commit, _*) => println("squash commits (" + selection.items + ")")
-            case _ => println("Do nothing. Zero or one commit selected")
+          selection.indices.size match {
+            case 0 => println("Do nothing. No commit selected")
+            case 1 => println("Do nothing. Only one commit selected")
+            case _ => println("squash commits (" + selection.items + ")")
           }
         case KeyPressed(_, Key.F5, 0, _) =>
-          print(Key.F5 + ": ")
-          selection.items match {
-            case _ => println("Refresh")
-          }
+          println(Key.F5 + ": Refresh")
 
         //        case KeyPressed(source, key, modifier, location) =>
         //          println("key: " + key + ", modifier: " + modifier)
