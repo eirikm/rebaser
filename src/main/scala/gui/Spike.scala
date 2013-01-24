@@ -41,8 +41,8 @@ object Spike extends SimpleSwingApplication {
             case Seq(commit, _*) => println("prepend commit messages (" + selection.items + ")")
             case _ => println("Do nothing. No commit selected")
           }
-        case KeyPressed(_, Key.E, 0, _) =>
-          print(Key.E + ": ")
+        case KeyPressed(_, Key.X, 0, _) =>
+          print(Key.X + ": ")
           selection.items match {
             case Seq(commit) => println("explode commit (" + commit + ")")
             case Seq(commit, _*) => println("Do nothing. More than one commit selected")
@@ -54,9 +54,14 @@ object Spike extends SimpleSwingApplication {
             case Seq(commit, _*) => println("squash commits (" + selection.items + ")")
             case _ => println("Do nothing. Zero or one commit selected")
           }
+        case KeyPressed(_, Key.F5, 0, _) =>
+          print(Key.F5 + ": ")
+          selection.items match {
+            case _ => println("Refresh")
+          }
 
-//        case KeyPressed(source, key, modifier, location) =>
-//          println("key: " + key + ", modifier: " + modifier)
+        //        case KeyPressed(source, key, modifier, location) =>
+        //          println("key: " + key + ", modifier: " + modifier)
       }
     }
   }
