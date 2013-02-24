@@ -16,3 +16,7 @@ libraryDependencies += "com.madgag" % "org.eclipse.jgit" % "2.2.0.0.2-UNOFFICIAL
 
 libraryDependencies += "com.madgag" % "org.eclipse.jgit.junit" % "2.2.0.0.2-UNOFFICIAL-ROBERTO-RELEASE"
 
+// one-jar config
+seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
+
+libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
