@@ -2,6 +2,7 @@ package gui
 
 import swing._
 import event.{Key, KeyPressed}
+import rebaser.gui.RewordDialog
 
 object RebaserApp extends SimpleSwingApplication {
 
@@ -15,9 +16,9 @@ object RebaserApp extends SimpleSwingApplication {
       listenTo(keys)
 
       reactions += {
+        case KeyPressed(_, Key.R, 0, _) => rewordCommitCommand()
         case KeyPressed(_, Key.Down, Key.Modifier.Control, _) => moveCommitDownCommand()
         case KeyPressed(_, Key.Up, Key.Modifier.Control, _) => moveCommitUpCommand()
-        case KeyPressed(_, Key.R, 0, _) => rewordCommitCommand()
         case KeyPressed(_, Key.P, 0, _) => prependCommitsCommand()
         case KeyPressed(_, Key.X, 0, _) => explodeCommitCommand()
         case KeyPressed(_, Key.S, 0, _) => squashCommitsCommand()
@@ -27,6 +28,22 @@ object RebaserApp extends SimpleSwingApplication {
         //          println("key: " + key + ", modifier: " + modifier)
       }
 
+      def rewordCommitCommand() {
+        print(Key.R + ": ")
+        selection.indices.size match {
+          case 0 => println("Do nothing. No commit selected")
+          case 1 => {
+            println("reword commit (" + selection.items.head + ")")
+            for (newCommitMessage <- new RewordDialog(selection.items.head).rewordedCommitMessage) {
+              println(listData)
+              println(newCommitMessage)
+              listData = listData.updated(selection.indices.head, newCommitMessage)
+              println(listData)
+            }
+          }
+          case _ => println("Do nothing. More than one commit selected")
+        }
+      }
 
       def moveCommitDownCommand() {
         print(Key.Control + " + " + Key.Down + ": ")
@@ -60,15 +77,6 @@ object RebaserApp extends SimpleSwingApplication {
               selection.indices.empty
               selection.indices += selectedIndex - 1
             }
-          case _ => println("Do nothing. More than one commit selected")
-        }
-      }
-
-      def rewordCommitCommand() {
-        print(Key.R + ": ")
-        selection.indices.size match {
-          case 0 => println("Do nothing. No commit selected")
-          case 1 => println("reword commit (" + selection.items.head + ")")
           case _ => println("Do nothing. More than one commit selected")
         }
       }
