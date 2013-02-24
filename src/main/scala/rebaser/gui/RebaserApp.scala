@@ -1,18 +1,48 @@
 package gui
 
 import swing._
+import event.KeyPressed
 import event.{Key, KeyPressed}
 import rebaser.gui.RewordDialog
+import rebaser.Rebaser
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.lib.{ObjectId, Repository}
+import java.io.File
+import org.eclipse.jgit.api.Git
+import java.lang.Iterable
+import org.eclipse.jgit.revwalk.RevCommit
+import collection.JavaConversions._
+import scala.collection
 
 object RebaserApp extends SimpleSwingApplication {
+  val builder: FileRepositoryBuilder = new FileRepositoryBuilder()
+  val repository: Repository = builder.setGitDir(new File("/Users/eirikm/src/git/rebaser-test-repo/.git"))
+    .readEnvironment() // scan environment GIT_* variables
+    .findGitDir() // scan up the file system tree
+    .build()
+
+  val git: Git = new Git(repository)
+
+  val rebaser : Rebaser = new Rebaser(git)
+
+  val oldestCommit: ObjectId = repository.resolve("HEAD~6")
+  val newestCommit: ObjectId = repository.resolve("HEAD")
+  val log: Iterable[RevCommit] = git.log().addRange(oldestCommit, newestCommit).call()
+  val gitLog: collection.Iterable[RevCommit] = iterableAsScalaIterable(log)
+
+  val commitList: collection.Iterable[String] = gitLog map {
+    c: RevCommit =>
+      c.getShortMessage
+  }
+
 
   def top = new MainFrame {
     title = "Rebaser GUI (second draft)"
     location = new Point(10, 100)
 
-    val commitList = List("one", "two", "three", "four")
+    //val commitList = List("one", "two", "three", "four")
 
-    contents = new ListView(commitList) {
+    contents = new ListView(commitList.toList) {
       listenTo(keys)
 
       reactions += {

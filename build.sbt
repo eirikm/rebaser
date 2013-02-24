@@ -5,6 +5,7 @@ organization := "rebaser"
 scalaVersion := "2.9.2"
 
 mainClass in (Compile, run) := Some("gui.RebaserApp")
+//mainClass in (Compile, run) := Some("rebaser.gui.Spike")
 
 libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-swing" % "2.9.2",
