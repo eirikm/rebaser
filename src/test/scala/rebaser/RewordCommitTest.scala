@@ -79,4 +79,36 @@ class RewordCommitTest extends AbstractRebaserTest {
     val actualCommit3Msg: String = array(2).getShortMessage();
     assertFalse(rewordedCommitMessage equals actualCommit3Msg);
   }
+
+  @Test
+  @Ignore
+  def rewordSecondCommitProblematicDir {
+    // arrange
+    implicit val git = new Git(db);
+    val rebaser: Rebaser = new Rebaser(git)
+
+    val commit2Msg: String = "Add file2"
+    val commit3Msg: String = "Add file3"
+
+    val c1 = createNotRelevantInitialCommit()
+    val c2 = createAddAndCommitFile(GitFile("file2", "content for file2"), commit2Msg)
+    val c3 = createAddAndCommitFile(GitFile("dir/file3", "content for file3"), commit3Msg)
+    writeTrashFile("dir/problematic_dir/file", "content")
+    deleteTrashFile("dir/problematic_dir/file")
+
+    // act
+    val rewordedCommitMessage: String = "reworded commit message"
+    val res = rebaser.rewordCommit(c2, rewordedCommitMessage)
+
+    // assert
+    //    assertEquals(Status.OK, res.getStatus());
+    val logIterator: util.Iterator[RevCommit] = git.log().all().call().iterator();
+
+    val array: Array[RevCommit] = asScalaIterator(logIterator).toArray
+
+
+    // second commit
+    val actualCommit2Msg: String = array(1).getShortMessage();
+    assertEquals(rewordedCommitMessage, actualCommit2Msg);
+  }
 }
