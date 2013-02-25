@@ -1,18 +1,17 @@
 package gui
 
 import swing._
-import event.KeyPressed
 import event.{Key, KeyPressed}
 import rebaser.gui.RewordDialog
 import rebaser.Rebaser
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.lib.{ObjectId, Repository}
 import java.io.File
-import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.{RebaseResult, Git}
 import java.lang.Iterable
 import org.eclipse.jgit.revwalk.RevCommit
 import collection.JavaConversions._
-import scala.collection
+import swing.ListView.Renderer
 
 object RebaserApp extends SimpleSwingApplication {
   val builder: FileRepositoryBuilder = new FileRepositoryBuilder()
@@ -23,18 +22,17 @@ object RebaserApp extends SimpleSwingApplication {
 
   val git: Git = new Git(repository)
 
-  val rebaser : Rebaser = new Rebaser(git)
+  val rebaser: Rebaser = new Rebaser(git)
 
   val oldestCommit: ObjectId = repository.resolve("HEAD~6")
-  val newestCommit: ObjectId = repository.resolve("HEAD")
+  val newestCommit: ObjectId = head()
   val log: Iterable[RevCommit] = git.log().addRange(oldestCommit, newestCommit).call()
-  val gitLog: collection.Iterable[RevCommit] = iterableAsScalaIterable(log)
+  val commitList: List[RevCommit] = iterableAsScalaIterable(log).toList
 
-  val commitList: collection.Iterable[String] = gitLog map {
-    c: RevCommit =>
-      c.getShortMessage
-  }
+  def head(): ObjectId = repository.resolve("HEAD")
 
+  def log(oldestCommit: ObjectId, newestCommit: ObjectId): List[RevCommit] =
+    iterableAsScalaIterable(git.log().addRange(oldestCommit, newestCommit).call()).toList
 
   def top = new MainFrame {
     title = "Rebaser GUI (second draft)"
@@ -42,7 +40,8 @@ object RebaserApp extends SimpleSwingApplication {
 
     //val commitList = List("one", "two", "three", "four")
 
-    contents = new ListView(commitList.toList) {
+    contents = new ListView(commitList) {
+      renderer = Renderer(_.getShortMessage)
       listenTo(keys)
 
       reactions += {
@@ -63,12 +62,11 @@ object RebaserApp extends SimpleSwingApplication {
         selection.indices.size match {
           case 0 => println("Do nothing. No commit selected")
           case 1 => {
-            println("reword commit (" + selection.items.head + ")")
-            for (newCommitMessage <- new RewordDialog(selection.items.head).rewordedCommitMessage) {
-              println(listData)
-              println(newCommitMessage)
-              listData = listData.updated(selection.indices.head, newCommitMessage)
-              println(listData)
+            val selectedCommit: RevCommit = selection.items.head
+            println("reword commit (" + selectedCommit.getId + ")")
+            for (newCommitMessage <- new RewordDialog(selectedCommit.getFullMessage).rewordedCommitMessage) {
+              val result: RebaseResult = rebaser.rewordCommit(selectedCommit, newCommitMessage)
+              listData = log(oldestCommit, head())
             }
           }
           case _ => println("Do nothing. More than one commit selected")
