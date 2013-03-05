@@ -26,10 +26,18 @@ object RebaserApp extends SimpleSwingApplication {
 
   val rebaser: Rebaser = new Rebaser(git)
 
-  val oldestCommit: ObjectId = repository.resolve("HEAD~6")
+  var oldestCommit: ObjectId = repository.resolve("HEAD~6")
   val newestCommit: ObjectId = head()
-  val log: Iterable[RevCommit] = git.log().addRange(oldestCommit, newestCommit).call()
-  val commitList: List[RevCommit] = iterableAsScalaIterable(log).toList
+  def log: Iterable[RevCommit] = git.log().addRange(oldestCommit, newestCommit).call()
+  def commitList: List[RevCommit] = iterableAsScalaIterable(log).toList
+
+
+  override def main(args: Array[String]) {
+    super.main(args)
+    if (!args.isEmpty) {
+      oldestCommit = repository.resolve(args(0))
+    }
+  }
 
   def head(): ObjectId = repository.resolve("HEAD")
 
