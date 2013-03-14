@@ -15,6 +15,7 @@ import swing.ListView.Renderer
 import scala.swing.BorderPanel.Position._
 
 object RebaserApp extends SimpleSwingApplication {
+  val DEBUG = false
   val builder: FileRepositoryBuilder = new FileRepositoryBuilder()
   var repoPath: String = "/Users/eirikm/src/git/rebaser-test-repo/.git"
 
@@ -52,6 +53,10 @@ object RebaserApp extends SimpleSwingApplication {
   def log(oldestCommit: ObjectId, newestCommit: ObjectId): List[RevCommit] =
     iterableAsScalaIterable(git.log().addRange(oldestCommit, newestCommit).call()).toList
 
+  def debug(message: => String) {
+    if (DEBUG) println(message)
+  }
+
   def top = new MainFrame {
     title = "Rebaser GUI (second draft)"
     location = new Point(10, 100)
@@ -70,8 +75,8 @@ object RebaserApp extends SimpleSwingApplication {
 
         reactions += {
           case KeyPressed(_, Key.R, 0, _) => rewordCommitCommand()
-          case KeyPressed(_, Key.Down, Key.Modifier.Control, _) => moveCommitDownCommand()
-          case KeyPressed(_, Key.Up, Key.Modifier.Control, _) => moveCommitUpCommand()
+//          case KeyPressed(_, Key.Down, Key.Modifier.Control, _) => moveCommitDownCommand()
+//          case KeyPressed(_, Key.Up, Key.Modifier.Control, _) => moveCommitUpCommand()
           case KeyPressed(_, Key.P, 0, _) => prependCommitsCommand()
           case KeyPressed(_, Key.X, 0, _) => explodeCommitCommand()
           case KeyPressed(_, Key.S, 0, _) => squashCommitsCommand()
@@ -82,81 +87,81 @@ object RebaserApp extends SimpleSwingApplication {
         }
 
         def rewordCommitCommand() {
-          print(Key.R + ": ")
+          val prefix: String = (Key.R + ": ")
           selection.indices.size match {
-            case 0 => println("Do nothing. No commit selected")
+            case 0 => debug(prefix + "Do nothing. No commit selected")
             case 1 => {
               val selectedCommit: RevCommit = selection.items.head
-              println("reword commit (" + selectedCommit.getId + ")")
+              debug(prefix + "reword commit (" + selectedCommit.getId + ")")
               for (newCommitMessage <- new RewordDialog(selectedCommit.getFullMessage).rewordedCommitMessage) {
                 val result: RebaseResult = rebaser.rewordCommit(selectedCommit, newCommitMessage)
                 listData = log(oldestCommit, head())
               }
             }
-            case _ => println("Do nothing. More than one commit selected")
+            case _ => debug(prefix + "Do nothing. More than one commit selected")
           }
         }
 
         def moveCommitDownCommand() {
-          print(Key.Control + " + " + Key.Down + ": ")
+          val prefix = (Key.Control + " + " + Key.Down + ": ")
           selection.indices.size match {
             case 0 => println("Do nothing. No commit selected")
             case 1 =>
               val selectedIndex: Int = selection.indices.head
               if (selectedIndex == commitList.size - 1)
-                println("can't move past last commit")
+                debug(prefix + "can't move past last commit")
               else {
-                println("move commit down (" + selection.items.head + ")")
+                debug(prefix + "move commit down (" + selection.items.head + ")")
                 listData = swapWithNext(listData.toList, selectedIndex)
                 selection.indices.empty
                 selection.indices += selectedIndex + 1
               }
-            case _ => println("Do nothing. More than one commit selected")
+            case _ => debug(prefix + "Do nothing. More than one commit selected")
           }
         }
 
         def moveCommitUpCommand() {
-          print(Key.Control + " + " + Key.Up + ": ")
+          val prefix = (Key.Control + " + " + Key.Up + ": ")
           selection.indices.size match {
-            case 0 => println("Do nothing. No commit selected")
+            case 0 => debug(prefix + "Do nothing. No commit selected")
             case 1 =>
               val selectedIndex: Int = selection.indices.head
               if (selectedIndex == 0)
-                println("can't move before first commit")
+                debug(prefix + "can't move before first commit")
               else {
-                println("move commit up (" + selection.items.head + ")")
+                debug(prefix + "move commit up (" + selection.items.head + ")")
                 listData = swapWithPrevious(listData.toList, selectedIndex)
                 selection.indices.empty
                 selection.indices += selectedIndex - 1
               }
-            case _ => println("Do nothing. More than one commit selected")
+            case _ => debug(prefix + "Do nothing. More than one commit selected")
           }
         }
 
         def prependCommitsCommand() {
-          print(Key.P + ": ")
+          val prefix = (Key.P + ": ")
           selection.indices.size match {
-            case 0 => println("Do nothing. No commit selected")
-            case 1 => println("prepend commit messages (" + selection.items.head + ")")
-            case _ => println("prepend commit messages (" + selection.items + ")")
+            case 0 => debug(prefix + "Do nothing. No commit selected")
+            case 1 => debug(prefix + "prepend commit messages (" + selection.items.head + ")")
+            case _ => debug(prefix + "prepend commit messages (" + selection.items + ")")
           }
         }
 
         def explodeCommitCommand() {
-          print(Key.X + ": ")
+          val prefix = (Key.X + ": ")
           selection.indices.size match {
-            case 0 => println("Do nothing. No commit selected")
-            case 1 => println("explode commit (" + selection.items.head + ")")
-            case _ => println("Do nothing. More than one commit selected")
+            case 0 => debug(prefix + "Do nothing. No commit selected")
+            case 1 => debug(prefix + "explode commit (" + selection.items.head + ")")
+            case _ => debug(prefix + "Do nothing. More than one commit selected")
           }
         }
 
         def squashCommitsCommand() {
-          print(Key.S + ": ")
+          val prefix = (Key.S + ": ")
           selection.indices.size match {
-            case 0 => println("Do nothing. No commit selected")
-            case 1 => println("Do nothing. Only one commit selected")
-            case _ => println("squash commits (" + selection.items + ")")
+            case 0 => debug(prefix + "Do nothing. No commit selected")
+            case 1 => debug(prefix + "Do nothing. Only one commit selected")
+            case _ => debug(prefix + "squash commits (" + selection.items + ")")
           }
         }
       }
