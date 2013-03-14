@@ -16,27 +16,35 @@ import scala.swing.BorderPanel.Position._
 
 object RebaserApp extends SimpleSwingApplication {
   val builder: FileRepositoryBuilder = new FileRepositoryBuilder()
-  val repoPath: String = "/Users/eirikm/src/git/rebaser-test-repo/.git"
-  val repository: Repository = builder.setGitDir(new File(repoPath))
-    .readEnvironment() // scan environment GIT_* variables
-    .findGitDir() // scan up the file system tree
-    .build()
+  var repoPath: String = "/Users/eirikm/src/git/rebaser-test-repo/.git"
 
-  val git: Git = new Git(repository)
+  var repository: Repository = _
+  var git: Git = _
+  var rebaser: Rebaser = _
 
-  val rebaser: Rebaser = new Rebaser(git)
-
-  var oldestCommit: ObjectId = repository.resolve("HEAD~6")
-  val newestCommit: ObjectId = head()
+  var oldestCommitParam: String = _
+  var oldestCommit: ObjectId = _
+  lazy val newestCommit: ObjectId = head()
   def log: Iterable[RevCommit] = git.log().addRange(oldestCommit, newestCommit).call()
   def commitList: List[RevCommit] = iterableAsScalaIterable(log).toList
 
 
   override def main(args: Array[String]) {
-    super.main(args)
     if (!args.isEmpty) {
-      oldestCommit = repository.resolve(args(0))
+      repoPath = args(0)
+      oldestCommitParam = args(1)
+    } else {
+      oldestCommitParam = "HEAD~6"
     }
+
+    repository = builder.setGitDir(new File(repoPath))
+      .readEnvironment() // scan environment GIT_* variables
+      .findGitDir() // scan up the file system tree
+      .build()
+    oldestCommit = repository.resolve(oldestCommitParam)
+    git = new Git(repository)
+    rebaser = new Rebaser(git)
+    super.main(args)
   }
 
   def head(): ObjectId = repository.resolve("HEAD")

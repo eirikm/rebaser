@@ -1,0 +1,10 @@
+#!/bin/sh
+
+GIT_DIR=`git rev-parse --show-toplevel`/.git
+TEMP_BRANCH_NAME=`uuidgen`
+
+#git checkout -b $TEMP_BRANCH_NAME
+
+START_COMMIT=`git rev-parse $1`
+
+java -jar /Users/eirikm/src/git/rebaser/target/scala-2.9.2/rebaser_2.9.2-0.1-SNAPSHOT-one-jar.jar $GIT_DIR $START_COMMIT
